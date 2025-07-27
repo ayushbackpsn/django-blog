@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blog Posts</title>
+</head>
+<body>
+    <h1>Blog Posts</h1>
+    <div id="posts"></div>
+
+    <h2>Add a New Post</h2>
+    <form id="postForm">
+        <input type="text" id="title" placeholder="Title" required><br>
+        <textarea id="content" placeholder="Content" required></textarea><br>
+        <button type="submit">Add Post</button>
+    </form>
+
+    <script>
+        async function loadPosts() {
+            const res = await fetch('/api/blog/');
+            const data = await res.json();
+            const postsDiv = document.getElementById('posts');
+            postsDiv.innerHTML = '';
+            data.forEach(post => {
+                postsDiv.innerHTML += `<h3>${post.title}</h3><p>${post.content}</p><hr>`;
+            });
+        }
+
+        document.getElementById('postForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+
+            const res = await fetch('/api/blog/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content })
+            });
+
+            if (res.ok) {
+                alert('Post added!');
+                loadPosts();
+                this.reset();
+            } else {
+                alert('Failed to add post.');
+            }
+        });
+
+        loadPosts();
+    </script>
+</body>
+</html>
